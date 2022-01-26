@@ -1,0 +1,18 @@
+name:
+on:
+  push:
+    branches:
+      - main
+      - dev
+      - cert
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    # if the branch is "main" uses "prod" environment, if branch is anything else uses "dev" env
+    environment:
+      ${{ contains(github.ref, 'main') && 'prod' || 'dev'}}   
+    steps:
+      - uses: actions/checkout@v2
+      - run: echo "hello world"
+      - run: echo ${{ secrets.MY_COOL_ENVIRONMENT_SECRECT }}

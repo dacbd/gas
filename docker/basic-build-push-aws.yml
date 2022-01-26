@@ -1,0 +1,32 @@
+name: Build Container
+on: [push]
+jobs:
+  build:
+    runs-on: self-hosted # ubuntu-latest would require an AWS service account
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Set up AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: us-west-2
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }} # not a senstive vale
+          role-duration-seconds: 3600
+          role-skip-session-tagging: true
+
+      - name: Docker login
+        uses: docker/login-action@v1
+        with:
+          registry: 262328827817.dkr.ecr.us-west-2.amazonaws.com
+
+      - name: Setup docker buildx
+        uses: docker/setup-buildx-actions@v1
+
+      - name: Build and Push
+        uses: docker/build-push-action@v2
+        with:
+          context: ./
+          file: ./Dockerfile
+          push: true
+          tags: 262328827817.dkr.ecr.us-west-2.amazonaws.com/<image_name>:<tag> # csv list registry/image_name:tag,registry/image_name:tag

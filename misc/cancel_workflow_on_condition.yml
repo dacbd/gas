@@ -1,0 +1,24 @@
+name: exit early
+on: workflow_dispatch
+jobs:
+  authorize:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          some_condition_value=$(date +%w)
+          if [ "$some_condition_value" == 5 ]; then
+            echo "Authorized"
+            exit 0
+          else
+            echo "Not Authorized"
+            curl \
+              -X POST \
+              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              -H "Accept: application/vnd.github.v3+json" \
+              https://api.github.com/repos/${{ github.repository }}/actions/runs/$GITHUB_RUN_ID/cancel
+          fi
+  run:
+    needs: [authorize]
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "hello world"

@@ -1,0 +1,33 @@
+---
+# Purpose: test pull requests to your cert or prod branch 
+# setup your "control" github actions environment to require manual approval
+# then with this workflow you can decide to deploy the PR to a testing environment
+# before merging the PR and triggering an actual deployment. 
+name: Test & Deploy
+on:
+  pull_request_target:
+jobs:
+  authorize:
+    environment: control
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo ✓
+
+  lint:
+    needs: authorize
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "example"
+
+  build:
+    needs: authorize
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "example"
+
+  deploy:
+    needs: build
+    environment: test
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "your deployment steps"
